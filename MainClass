@@ -1,0 +1,62 @@
+package ilstu.edu;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Scanner;
+
+public class MainClass {
+
+	public static void main(String[] args) {
+		
+		MorseTree tree = new MorseTree();
+		buildTree(tree);
+		Scanner scanner = new Scanner(System.in);
+		String userInput;
+
+		do {
+			System.out.print("Please enter the encoded message or type stop to exit: ");
+			userInput = scanner.nextLine();
+
+			if (!userInput.equalsIgnoreCase("stop")) {
+				String decodedMessage = decode(tree, userInput);
+				if (decodedMessage != null) {
+					System.out.println("The decoded message is: " + decodedMessage);
+				} else {
+					System.out.println("Please enter a valid encoded message!");
+				}
+			}
+
+		} while (!userInput.equalsIgnoreCase("stop"));
+
+		System.out.println("Cya Ltr!");
+		scanner.close();
+	}
+
+	private static void buildTree(MorseTree tree) {
+		try (BufferedReader br = new BufferedReader(new FileReader("morse_code.txt"))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				String[] parts = line.split(" ");
+				char letter = parts[0].charAt(0);
+				String code = parts[1];
+				tree.add(letter, code);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static String decode(MorseTree tree, String encodedMessage) {
+		StringBuilder decodedMessage = new StringBuilder();
+		String[] codes = encodedMessage.split(" ");
+		for (String code : codes) {
+			char letter = tree.decode(code);
+			if (letter == '\0') {
+				return null;
+			}
+			decodedMessage.append(letter);
+		}
+		return decodedMessage.toString();
+	}
+}
